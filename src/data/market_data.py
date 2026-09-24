@@ -12,7 +12,7 @@ def get_market_data(ticker: str, start: str, end: str) -> pd.DataFrame:
         end (str): The end date in 'YYYY-MM-DD' format.
 
     Returns:
-        pandas.DataFrame: A DataFrame containing the market data.
+        pd.DataFrame: A DataFrame containing the market data.
 
     Raises:
         ValueError: If the dates are invalid, incorrectly ordered, or in the future, if the ticker symbol is empty, or if no market data is found for the specified ticker and date range.
@@ -42,5 +42,8 @@ def get_market_data(ticker: str, start: str, end: str) -> pd.DataFrame:
 
     if data.empty:
         raise ValueError(f"No data found for ticker '{ticker}' between {start} and {end}.")
+
+    if isinstance(data.columns, pd.MultiIndex):
+        data.columns = data.columns.get_level_values(0)
 
     return data
