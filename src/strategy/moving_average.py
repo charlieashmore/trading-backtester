@@ -29,10 +29,13 @@ def generate_signals(data : pd.DataFrame) -> pd.DataFrame:
     Generate buy/sell signals based on moving average crossovers.
 
     Parameters:
-    - data: A pandas DataFrame containing market data with 'Short_MA' and 'Long_MA' columns (generated from passing market data through the calculate_moving_averages function).
+        data (pd.DataFrame): A pandas DataFrame containing market data with 'Short_MA' and 'Long_MA' columns (generated from passing market data through the calculate_moving_averages function).
 
     Returns:
-    A pandas DataFrame with a new column 'Signal' indicating buy (1), sell (-1), or hold (0).
+        pd.DataFrame: A pandas DataFrame with a new column 'Signal' indicating buy (1), sell (-1), or hold (0).
+
+    Raises:
+        ValueError: If the input DataFrame does not contain the required 'Short_MA' and 'Long_MA' columns.
     """
     if 'Short_MA' not in data.columns or 'Long_MA' not in data.columns:
         raise ValueError("Data must contain 'Short_MA' and 'Long_MA' columns.")
