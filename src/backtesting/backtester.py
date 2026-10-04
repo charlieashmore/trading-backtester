@@ -79,3 +79,39 @@ def calculate_buy_and_hold_return(signals_data: pd.DataFrame, start_balance: flo
     remaining_balance = start_balance - amount_invested
     final_value = shares_bought * end_price + remaining_balance
     return calculate_return(start_balance, final_value)
+
+def calculate_buy_and_hold_values(signals_data: pd.DataFrame, start_balance: float) -> pd.DataFrame:
+    """
+    Calculate the portfolio values over time for a buy-and-hold strategy based on the provided market data.
+
+    Args:
+        signals_data (pd.DataFrame): A DataFrame containing market data with a 'Close' column.
+        start_balance (float): The initial amount of money available for trading.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the portfolio value over time, along with the balance and number of shares held.
+
+    Raises:
+        ValueError: If the signals_data does not contain a 'Close' column or is empty.
+    """
+    if signals_data.empty:
+        raise ValueError("signals_data is empty. Cannot calculate buy-and-hold values.")
+    if 'Close' not in signals_data.columns:
+        raise ValueError("signals_data must contain a 'Close' column")
+
+    start_price = signals_data['Close'].iloc[0]
+    shares_bought = int(start_balance // start_price)
+    amount_invested = shares_bought * start_price
+    remaining_balance = start_balance - amount_invested
+    final_values = []
+    for index, row in signals_data.iterrows():
+        current_price = row['Close']
+        final_value = shares_bought * current_price + remaining_balance
+        final_values.append({
+            'Date': index,
+            'Portfolio Value': final_value,
+            'Balance': remaining_balance,
+            'Shares': shares_bought,
+        })
+    buy_and_hold_values = pd.DataFrame(final_values)
+    return buy_and_hold_values
