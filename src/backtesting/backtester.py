@@ -71,7 +71,18 @@ def calculate_buy_and_hold_return(signals_data: pd.DataFrame, start_balance: flo
 
     Returns:
         float: The buy-and-hold return as a percentage, rounded to two decimal places.
+
+    Raises:
+        ValueError: If the signals_data does not contain a 'Close' column or if the start_balance is zero or negative.
     """
+    if signals_data.empty:
+        raise ValueError("signals_data is empty. Cannot calculate buy-and-hold return.")
+    if 'Close' not in signals_data.columns:
+        raise ValueError("signals_data must contain a 'Close' column")
+    if start_balance == 0:
+        raise ValueError("Starting balance cannot be zero.")
+    if start_balance < 0:
+        raise ValueError("Starting balance cannot be negative.")
     start_price = signals_data['Close'].iloc[0]
     end_price = signals_data['Close'].iloc[-1]
     shares_bought = int(start_balance // start_price)
@@ -92,8 +103,10 @@ def calculate_buy_and_hold_values(signals_data: pd.DataFrame, start_balance: flo
         pd.DataFrame: A DataFrame containing the portfolio value over time, along with the balance and number of shares held.
 
     Raises:
-        ValueError: If the signals_data does not contain a 'Close' column or is empty.
+        ValueError: If the signals_data does not contain a 'Close' column or is empty or start balance is less than 0.
     """
+    if start_balance < 0:
+        raise ValueError("Starting balance cannot be negative.")
     if signals_data.empty:
         raise ValueError("signals_data is empty. Cannot calculate buy-and-hold values.")
     if 'Close' not in signals_data.columns:
