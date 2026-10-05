@@ -3,7 +3,7 @@ from src.trading.trading_engine import TradingEngine
 
 def run_backtest(signals_data: pd.DataFrame, start_balance: float) -> pd.DataFrame:
     """
-    Run a backtest using the provided signals data and starting balance.
+    Run a backtest using the provided signals data and starting balance (trading is completed on the following days open price after the signal is generated).
 
     Parameters:
         signals_data (pd.DataFrame): A pandas DataFrame containing market data with 'Signal' column (generated from passing market data through the generate_signals function).
@@ -13,26 +13,31 @@ def run_backtest(signals_data: pd.DataFrame, start_balance: float) -> pd.DataFra
         pd.DataFrame: A pandas DataFrame containing the portfolio value over time, along with the balance and number of shares held.
 
     Raises:
-        ValueError: If signals_data does not contain the required 'Signal' and 'Close' columns.
+        ValueError: If signals_data does not contain the required 'Signal', 'Close', and 'Open' columns.
     """
     if 'Signal' not in signals_data.columns:
         raise ValueError("signals_data must contain a 'Signal' column")
     if 'Close' not in signals_data.columns:
         raise ValueError("signals_data must contain a 'Close' column")
+    if 'Open' not in signals_data.columns:
+        raise ValueError("signals_data must contain a 'Open' column")
 
     portfolio_history = []
     engine = TradingEngine(start_balance)
-    for index, row in signals_data.iterrows():
-        price = row['Close']
+    signal_data_copy = signals_data.copy()
+    signal_data_copy['Signal'] = signal_data_copy['Signal'].shift(1).fillna(0)
+    for index, row in signal_data_copy.iterrows():
+        trading_price = row['Open']
+        closing_price = row['Close']
         if row['Signal'] == 1:
-            shares_to_buy = int(engine.balance // price)
+            shares_to_buy = int(engine.balance // trading_price)
             if shares_to_buy > 0:
-                engine.buy(price, shares_to_buy)
+                engine.buy(trading_price, shares_to_buy)
         elif row['Signal'] == -1:
             shares_to_sell = engine.shares
             if shares_to_sell > 0:
-                engine.sell(price, shares_to_sell)
-        portfolio_value = engine.get_portfolio_value(price)
+                engine.sell(trading_price, shares_to_sell)
+        portfolio_value = engine.get_portfolio_value(closing_price)
         portfolio_history.append({
             'Date': index,
             'Portfolio Value': portfolio_value,

@@ -4,19 +4,21 @@ from src.backtesting.backtester import calculate_buy_and_hold_return, run_backte
 
 def test_run_backtest_buy_and_sell():
     sample_data = {
-        'Close': [100, 110, 120],
-        'Signal': [1, 0, -1]
+        'Open': [100, 110, 120, 130],
+        'Close': [110, 120, 130, 140],
+        'Signal': [1, 0, -1, 0]
     }
 
     sample_df = pd.DataFrame(sample_data)
     result = run_backtest(sample_df, 1000)
-    assert result['Portfolio Value'].tolist() == [1000, 1100, 1200]
-    assert result['Balance'].tolist() == [0, 0, 1200]
-    assert result['Shares'].tolist() == [10, 10, 0]
+    assert result['Portfolio Value'].tolist() == [1000, 1090, 1180, 1180]
+    assert result['Balance'].tolist() == [1000, 10, 10, 1180]
+    assert result['Shares'].tolist() == [0, 9, 9, 0]
 
 def test_run_backtest_no_buy_or_sell_signals():
     sample_data = {
-        'Close': [100, 110, 120],
+        'Open': [100, 110, 120],
+        'Close': [110, 120, 130],
         'Signal': [0, 0, 0]
     }
 
@@ -28,7 +30,8 @@ def test_run_backtest_no_buy_or_sell_signals():
 
 def test_run_backtest_sell_signal_without_shares():
     sample_data = {
-        'Close': [100, 110, 120],
+        'Open': [100, 110, 120],
+        'Close': [110, 120, 130],
         'Signal': [0, -1, 0]
     }
 
@@ -40,24 +43,27 @@ def test_run_backtest_sell_signal_without_shares():
 
 def test_run_backtest_leftover_balance_after_buy():
     sample_data = {
-        'Close': [100, 110, 120],
+        'Open': [100, 110, 120],
+        'Close': [110, 120, 130],
         'Signal': [1, 0, 0]
     }
 
     sample_df = pd.DataFrame(sample_data)
     result = run_backtest(sample_df, 1050)
-    assert result['Portfolio Value'].tolist() == [1050, 1150, 1250]
-    assert result['Balance'].tolist() == [50, 50, 50]
-    assert result['Shares'].tolist() == [10, 10, 10]
+    assert result['Portfolio Value'].tolist() == [1050, 1140, 1230]
+    assert result['Balance'].tolist() == [1050, 60, 60]
+    assert result['Shares'].tolist() == [0, 9, 9]
 
 @pytest.mark.parametrize("label", [
+    'Open',
     'Close',
     'Signal'
 ])
 def test_run_backtest_missing_columns(label):
     with pytest.raises(ValueError, match=f"signals_data must contain a '{label}' column"):
         sample_data = {
-            'Close': [100, 110, 120],
+            'Open': [100, 110, 120],
+            'Close': [110, 120, 130],
             'Signal': [1, 0, -1]
         }
         sample_df = pd.DataFrame(sample_data)
@@ -66,7 +72,8 @@ def test_run_backtest_missing_columns(label):
 
 def test_run_backtest_insufficient_balance_for_buy():
     sample_data = {
-        'Close': [100, 110, 120],
+        'Open': [100, 110, 120],
+        'Close': [110, 120, 130],
         'Signal': [1, 0, 0]
     }
 
