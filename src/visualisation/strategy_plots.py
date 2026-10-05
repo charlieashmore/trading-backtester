@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-def plot_strategy_signals(strategy_name: str, signal_data: pd.DataFrame):
+def plot_strategy_signals(strategy_name: str, signal_data: pd.DataFrame, ticker: str):
     """
     Plots the signals of a specific trading strategy based on the provided signal data.
 
@@ -30,13 +30,13 @@ def plot_strategy_signals(strategy_name: str, signal_data: pd.DataFrame):
     plt.scatter(buy_rows.index, buy_rows['Close'], marker='^', color='green', label='Buy')
     plt.scatter(sell_rows.index, sell_rows['Close'], marker='v', color='red', label='Sell')
 
-    plt.title(f'{strategy_name} Strategy Signals')
+    plt.title(f'{ticker} {strategy_name} Strategy Signals')
     plt.xlabel('Date')
     plt.ylabel('Price')
     plt.legend()
     plt.tight_layout()
 
-def plot_portfolio_values(portfolio_data: pd.DataFrame, buy_and_hold_data: pd.DataFrame):
+def plot_portfolio_values(portfolio_data: pd.DataFrame, buy_and_hold_data: pd.DataFrame, ticker: str):
     """
     Plots the portfolio value over time for both the strategy and the buy-and-hold approach.
 
@@ -61,7 +61,7 @@ def plot_portfolio_values(portfolio_data: pd.DataFrame, buy_and_hold_data: pd.Da
     plt.plot(portfolio_data['Date'], portfolio_data['Portfolio Value'], label='Strategy', color='blue')
     plt.plot(buy_and_hold_data['Date'], buy_and_hold_data['Portfolio Value'], label='Buy-and-Hold', color='red')
 
-    plt.title('Portfolio Value Over Time')
+    plt.title(f'{ticker} Portfolio Value Over Time')
     plt.xlabel('Date')
     plt.ylabel('Portfolio Value')
     plt.legend()
